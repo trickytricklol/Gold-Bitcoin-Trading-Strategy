@@ -1,0 +1,22 @@
+# 数据与结果 (体积大/可再生成)
+data/raw/*.csv
+results/
+__pycache__/
+*.pyc
+*.h5
+*.pkl
+
+# 环境
+.venv/
+venv/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# 系统
+Thumbs.db
+.DS_Store
