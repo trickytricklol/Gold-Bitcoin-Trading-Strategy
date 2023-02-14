@@ -1,0 +1,66 @@
+# ============================================================
+# Gold-Bitcoin Trading Strategy —— 全局配置
+# 论文复现: "Analysis of the best trading strategies
+#           based on neural networks"
+# ============================================================
+
+data:
+  raw_dir: data/raw                # 原始数据目录
+  gold_file: LBMA-GOLD.csv         # 黄金价格 (2021 MCM Problem C 官方数据)
+  bitcoin_file: BCHAIN-MKPRU.csv   # 比特币价格 (2021 MCM Problem C 官方数据)
+  start_date: "2016-09-11"         # 回测起始日 (论文: 2016-09-11)
+  end_date: "2021-09-10"           # 回测结束日 (论文: 2021-09-10)
+  backtest_mode: full              # full=全程回溯(论文设定) | tail=训练70%/回测30%
+  warmup_days: 500                 # full 模式的初始训练窗口 (天)
+  train_ratio: 0.7                 # tail 模式的训练集比例
+
+arima:
+  # 论文 Table 1 给出的 ARIMA 阶数
+  gold:
+    p: 2
+    d: 1
+    q: 2
+  bitcoin:
+    p: 2
+    d: 1
+    q: 2
+  refit_every: 30                  # 滚动预测时每隔多少天重新估计一次参数
+
+lstm:
+  # 论文 2.2 节: 单层 LSTM, 12 个神经元, relu, Dropout 0.3, Adam, MAE
+  units: 12                        # LSTM 神经元个数
+  lookback: 10                     # 输入时间步数 (滑动窗口长度)
+  features: 1                      # 特征数 (仅用价格本身)
+  dropout: 0.3
+  activation: relu
+  optimizer: adam
+  loss: mae
+  epochs: 120
+  batch_size: 32
+  validation_split: 0.1
+  patience: 12                     # 早停耐心值
+  refit_every: 30                  # 滚动预测时每隔多少天重新训练一次
+
+critic:
+  # CRITIC 客观赋权 (无需额外超参)
+
+strategy:
+  initial_capital: 1000.0          # 初始资金 (论文: $1,000)
+  commission_gold: 0.01            # 黄金买卖手续费比例 (0.99 留存)
+  commission_bitcoin: 0.02         # 比特币买卖手续费比例 (0.98 留存)
+  p: 0.54                          # 固定资产投资比例 (论文结论: 54%)
+  k: 0.19                          # 比特币风险预警系数 (论文结论: 19%)
+
+tuning:
+  # p / k 网格寻优范围
+  p_start: 0.0
+  p_end: 1.0
+  p_step: 0.02
+  k_start: 0.0
+  k_end: 0.5
+  k_step: 0.02
+
+output:
+  results_dir: results
+  figure_dir: results/figures
+  log_file: results/pipeline.log
